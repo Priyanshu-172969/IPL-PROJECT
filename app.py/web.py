@@ -921,19 +921,95 @@ if page ==  "👤 Player Analysis":
                     use_container_width=True
                 )   
 
-
+    else :
+         st.warning("You Have Selected None")
 
 
 
             
 if page ==  "🏆 Team Analysis":
 
-     st.title("Team Analytics", text_alignment= "center", width= "stretch")  
-     st.write(
+    st.title("Team Analytics", text_alignment= "center", width= "stretch")  
+    st.write(
     "Explore the performance, achievements, and competitive journey of IPL teams "
     "through interactive, data-driven analytics. Analyze team wins, win percentages, "
     "matches played, season-wise performance, championship records, and overall "
     "consistency across different IPL seasons. Compare teams to understand their "
     "strengths, dominance, and performance trends throughout the history of the league."
     ) 
+
+    matches["team1"] = matches["team1"].replace({
+    "Royal Challengers Bangalore": "Royal Challengers Bengaluru"
+    })
+
+    matches["team2"] = matches["team2"].replace({
+        "Royal Challengers Bangalore": "Royal Challengers Bengaluru"
+    })
+
+    matches["team1"] = matches["team1"].replace({
+    "Kings XI Punjab": "Punjab Kings"
+    })
+
+    matches["team2"] = matches["team2"].replace({
+    "Kings XI Punjab": "Punjab Kings"
+    })
+
+    matches["team1"] = matches["team1"].replace({
+    "Delhi Daredevils": "Delhi Capitals"
+    })
+
+    matches["team2"] = matches["team2"].replace({
+    "Delhi Daredevils": "Delhi Capitals"
+    })
+    team = sorted(set(matches["team1"].dropna()) | set(matches["team2"].dropna()))
+    
+     
+    select = st.selectbox("Search your Team :", team, index = None, placeholder= "Team ?")
+    if select :
+        st.success(f"You Have Selected {select}")
+
+        col1,col2,col3= st.columns(3)
+
+        play = pd.concat([matches["team1"],matches["team2"]]).value_counts().get(select,0)  
+        with col1:
+            st.metric("Matches Played",play)    
+        
+        a = matches.groupby("winner").size().get(select,0)
+        with col2:
+            st.metric("Matches Won",a)     
+        
+        x = matches.groupby("season").last()["winner"]
+        trophies = x.value_counts().get(select,0)
+        with col3:
+            st.metric("Trophies",trophies) 
+
+        col4 = st.columns(1)[0] 
+
+        home_venue = {
+        "Chennai Super Kings": "M. A. Chidambaram Stadium",
+        "Delhi Capitals": "Arun Jaitley Stadium",
+        "Gujarat Titans": "Narendra Modi Stadium",
+        "Kolkata Knight Riders": "Eden Gardens",
+        "Lucknow Super Giants": "BRSABV Ekana Cricket Stadium",
+        "Mumbai Indians": "Wankhede Stadium",
+        "Punjab Kings": "Maharaja Yadavindra Singh International Cricket Stadium",
+        "Rajasthan Royals": "Sawai Mansingh Stadium",
+        "Royal Challengers Bengaluru": "M. Chinnaswamy Stadium",
+        "Sunrisers Hyderabad": "Rajiv Gandhi International Cricket Stadium",
+
+        # Former IPL teams
+        "Deccan Chargers": "Rajiv Gandhi International Cricket Stadium",
+        "Gujarat Lions": "Saurashtra Cricket Association Stadium; Green Park",
+        "Kochi Tuskers Kerala": "Jawaharlal Nehru Stadium",
+        "Pune Warriors": "Maharashtra Cricket Association Stadium",
+        "Rising Pune Supergiant": "Maharashtra Cricket Association Stadium"
+    }.get(select,0)
+        with col4:
+            st.metric("Home Venue",home_venue)
+
+
+         
+    else:
+         st.warning("You Have Selected None")    
+
      
